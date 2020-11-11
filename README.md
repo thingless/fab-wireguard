@@ -38,7 +38,7 @@ Second, run `wg_register_host` job on all new or changed hosts. This job assigns
 network='net0'
 hostname=None    # None -> use the host's configured hostname
 region=None      # if set, assume private IPs are reachable from all hosts in region
-reachable=True   # set to false for road warriors behind a vpn etc
+reachable=True   # set to false for road warriors behind a nat etc
 ```
 
 
