@@ -16,6 +16,9 @@ Few issues to resolve:
 5. wg_reconfig_all job that uses hosts.yaml to update all hosts
 6. add support for generating PowerDNS config files for .srv. records
 
+Caveats:
+1. Unreachable nodes (i.e. road warriors) cannot talk to each other, only to publicly reachable nodes.
+
 HOWTO:
 
 Zeroth, get the dependencies. Tested in python2, but might work with 3 with minor changes:
