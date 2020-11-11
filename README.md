@@ -34,16 +34,20 @@ networks:
 
 
 Second, run `wg_register_host` job on all new or changed hosts. This job assigns IPs & edits hosts.yaml, so no parallel! Arguments:
+```
 network='net0'
 hostname=None    # None -> use the host's configured hostname
 region=None      # if set, assume private IPs are reachable from all hosts in region
 reachable=True   # set to false for road warriors behind a vpn etc
+```
 
 
 Third, run `wg_reconfig` on _all_ hosts in the network. This job actually creates the wg config files. Arguments:
+```
 network='net0'
 hostname=None       # None -> use the host's configured hostname
 can_register=False  # if set to True, will try to register any unknown hosts - will need to run reconfig a second time
+```
 
 
 A few example commands from my testing:
