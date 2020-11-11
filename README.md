@@ -20,7 +20,7 @@ HOWTO:
 
 Zeroth, get the dependencies. Tested in python2, but might work with 3 with minor changes:
 ```
-pip2 install fab<2 ipaddress pyyaml tornado
+pip2 install fabric<2.0 ipaddress pyyaml tornado
 ```
 
 First, edit config/hosts.yaml and define a network.
