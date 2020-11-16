@@ -7,7 +7,7 @@ SaveConfig = false
 {% for peer in peers %}
 [Peer]
 PublicKey = {{ peer['pubkey'] }}
-AllowedIPs = {{ peer['ip4'] }}/32,{{ peer['ip6'] }}/128
+AllowedIPs = {{ peer['ip4'] }}/32,{{ peer['ip6'] }}/128{% if peer.get('routes') %}, {{ ','.join(peer['routes'])}}{% end %}
 {% if peer.get('endpoint') %}Endpoint = {{ peer['endpoint'] }}{% end %}
 {% if net.get('psk') %}PresharedKey = {{ net['psk'] }}{% end %}
 {% if not host.get('port') %}PersistentKeepalive = 25{% end %}

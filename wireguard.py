@@ -34,6 +34,8 @@ class HostsDB(object):
         import yaml
         with open(self.path) as inp:
             self.data = yaml.full_load(inp)
+        if not self.data:
+            self.data = {}
         if not self.data.get('hosts'):
             self.data['hosts'] = []  # for new users
         if not self.data.get('networks'):
@@ -167,10 +169,13 @@ def wg_genkey(network='net0', force=False):
     return pubkey.strip()
 
 def wg_register_host(network='net0', hostname=None, region=None, reachable=True):
+    db = HostsDB()
+    if not db.find_net_by_name(network):
+        raise ValueError("You must define the network first in hosts.yaml")
+
     if hostname is None:
         hostname = run('hostname').strip()
 
-    db = HostsDB()
     host = db.find_host_by_name(hostname)
     if not host:
         # new host
@@ -221,7 +226,7 @@ def wg_reconfig(network='net0', hostname=None, can_register=False):
             peer['endpoint'] = peer['publicip'] + ':' + str(peer['port'])
 
     from tornado import template
-    with open(os.path.join(CFG_DIR, 'wg-quick.conf.templ') as inp:
+    with open(os.path.join(CFG_DIR, 'wg-quick.conf.templ')) as inp:
         templ = template.Template(inp.read())
     txt = templ.generate(
         ip4mask=net['ip4'].split('/')[-1],

@@ -10,11 +10,10 @@ Cool features:
 
 Few issues to resolve:
 1. support for non-Ubuntu hosts
-2. support for additional routes advertised by hosts
-3. better support for non-DO hosts in get_ip_addresses()
-4. do not restart the wg interfaces on each reconfig (wg-quick strip)
-5. wg_reconfig_all job that uses hosts.yaml to update all hosts
-6. add support for generating PowerDNS config files for .srv. records
+2. better support for non-DO hosts in get_ip_addresses()
+3. do not restart the wg interfaces on each reconfig (wg-quick strip)
+4. wg_reconfig_all job that uses hosts.yaml to update all hosts
+5. add support for generating PowerDNS config files for .srv. records
 
 Caveats:
 1. Unreachable nodes (i.e. road warriors) cannot talk to each other, only to publicly reachable nodes.
