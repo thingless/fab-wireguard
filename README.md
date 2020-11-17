@@ -25,7 +25,7 @@ Zeroth, get the dependencies. Tested in python2, but might work with 3 with mino
 pip2 install fabric<2.0 ipaddress pyyaml tornado
 ```
 
-First, edit config/hosts.yaml and define a network.
+First, edit `wg-hosts.yaml` and define a network.
 ```
 networks:
 - name: net0
@@ -35,7 +35,7 @@ networks:
 ```
 
 
-Second, run `wg_register_host` job on all new or changed hosts. This job assigns IPs & edits hosts.yaml, so no parallel! Arguments:
+Second, run `wg_register` job on all new or changed hosts. This job assigns IPs & edits hosts.yaml, so no parallel! Arguments:
 ```
 network='net0'
 hostname=None    # None -> use the host's configured hostname
@@ -54,6 +54,6 @@ can_register=False  # if set to True, will try to register any unknown hosts - w
 
 A few example commands from my testing:
 ```
-fab -f wireguard.py --user root -H 128.199.8.213,128.199.8.53,143.110.148.29,143.110.155.200 wg_register_host
+fab -f wireguard.py --user root -H 128.199.8.213,128.199.8.53,143.110.148.29,143.110.155.200 wg_register
 fab -P -f wireguard.py --user root -H 128.199.8.213,128.199.8.53,143.110.148.29,143.110.155.200 wg_reconfig
 ```

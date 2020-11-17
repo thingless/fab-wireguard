@@ -20,11 +20,25 @@ try:  # py3
 except ImportError:  # py2
     from pipes import quote as shell_quote
 
-# Path to config files
-CFG_DIR = 'config'
+TEMPLATE = '''
+[Interface]
+Address = {{ host['ip4'] }}/{{ ip4mask }},{{ host['ip6'] }}/{{ ip6mask }}
+PrivateKey = ##REPLACE WITH PRIVATE KEY##
+SaveConfig = false
+{% if host.get('port') %}ListenPort = {{ host['port'] }}{% end %}
+
+{% for peer in peers %}
+[Peer]
+PublicKey = {{ peer['pubkey'] }}
+AllowedIPs = {{ peer['ip4'] }}/32,{{ peer['ip6'] }}/128{% if peer.get('routes') %}, {{ ','.join(peer['routes'])}}{% end %}
+{% if peer.get('endpoint') %}Endpoint = {{ peer['endpoint'] }}{% end %}
+{% if net.get('psk') %}PresharedKey = {{ net['psk'] }}{% end %}
+{% if not host.get('port') %}PersistentKeepalive = 25{% end %}
+{% end %}
+'''.strip() + '\n'
 
 class HostsDB(object):
-    def __init__(self, path=os.path.join(CFG_DIR, 'hosts.yaml')):
+    def __init__(self, path=os.getenv('WG_HOSTS', 'wg-hosts.yaml')):
         self.path = path
         self.data = None
 
@@ -168,7 +182,7 @@ def wg_genkey(network='net0', force=False):
     pubkey = sudo('wg pubkey < ' + privpath)
     return pubkey.strip()
 
-def wg_register_host(network='net0', hostname=None, region=None, reachable=True):
+def wg_register(network='net0', hostname=None, region=None, reachable=True):
     db = HostsDB()
     if not db.find_net_by_name(network):
         raise ValueError("You must define the network first in hosts.yaml")
@@ -226,8 +240,7 @@ def wg_reconfig(network='net0', hostname=None, can_register=False):
             peer['endpoint'] = peer['publicip'] + ':' + str(peer['port'])
 
     from tornado import template
-    with open(os.path.join(CFG_DIR, 'wg-quick.conf.templ')) as inp:
-        templ = template.Template(inp.read())
+    templ = template.Template(TEMPLATE)
     txt = templ.generate(
         ip4mask=net['ip4'].split('/')[-1],
         ip6mask=net['ip6'].split('/')[-1],
@@ -243,7 +256,10 @@ def wg_reconfig(network='net0', hostname=None, can_register=False):
     sudo('chmod 0600 ' + conffile)
 
     # replace the private key
-    sudo('''sed -i "s/##REPLACE WITH PRIVATE KEY##/$(cat {})/" {}'''.format(privfile,conffile))
+    sudo('''sed -i "s|##REPLACE WITH PRIVATE KEY##|$(cat {})|" {}'''.format(privfile,conffile))
+
+    # allow access via firewall if ufw available
+    sudo('ufw allow 51820/udp', warn_only=True)
 
     # reload the config
     # TODO: no interruptions
